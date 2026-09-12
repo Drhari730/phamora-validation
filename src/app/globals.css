@@ -1,26 +1,157 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-teal: var(--teal);
+  --color-teal-foreground: var(--teal-foreground);
+  --color-indigo: var(--indigo);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* PHAMORA design system — sourced verbatim from the app's own design tokens
+     (lib/core/theme/tokens.dart) so the validation portal reads as the same
+     product: violet primary, deep-indigo surfaces, teal accent. */
+  --background: #F6F7FB;
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  --popover: #FFFFFF;
+  --popover-foreground: #111827;
+  --primary: #5B3FD6;
+  --primary-foreground: #FFFFFF;
+  --indigo: #3F2BA8;
+  --secondary: #EFEAFC;
+  --secondary-foreground: #3F2BA8;
+  --muted: #F0F1F6;
+  --muted-foreground: #667085;
+  --accent: #1AB6B8;
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --border: #E7E8F0;
+  --input: #E7E8F0;
+  --ring: #5B3FD6;
+  --success: #22C55E;
+  --success-foreground: #0E6B34;
+  --warning: #F59E0B;
+  --warning-foreground: #92400E;
+  --teal: #1AB6B8;
+  --teal-foreground: #FFFFFF;
+  --chart-1: #5B3FD6;
+  --chart-2: #1AB6B8;
+  --chart-3: #F59E0B;
+  --chart-4: #22C55E;
+  --chart-5: #7C5CE8;
+  --radius: 1rem;
+  --sidebar: #241751;
+  --sidebar-foreground: #E7E3FB;
+  --sidebar-primary: #1AB6B8;
+  --sidebar-primary-foreground: #17123B;
+  --sidebar-accent: #3F2BA8;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #3A2B7A;
+  --sidebar-ring: #1AB6B8;
+}
+
+.dark {
+  --background: #15112E;
+  --foreground: #F1EFFB;
+  --card: #1D1740;
+  --card-foreground: #F1EFFB;
+  --popover: #1D1740;
+  --popover-foreground: #F1EFFB;
+  --primary: #8B74E8;
+  --primary-foreground: #15112E;
+  --indigo: #7C5CE8;
+  --secondary: #2A2160;
+  --secondary-foreground: #E7E3FB;
+  --muted: #271F55;
+  --muted-foreground: #A9A2CC;
+  --accent: #3FD1D3;
+  --accent-foreground: #0E2E2F;
+  --destructive: #F87171;
+  --border: rgba(255,255,255,0.12);
+  --input: rgba(255,255,255,0.15);
+  --ring: #3FD1D3;
+  --success: #4ADE80;
+  --success-foreground: #0E2E17;
+  --warning: #FBBF24;
+  --warning-foreground: #3B2A05;
+  --teal: #3FD1D3;
+  --teal-foreground: #0E2E2F;
+  --chart-1: #8B74E8;
+  --chart-2: #3FD1D3;
+  --chart-3: #FBBF24;
+  --chart-4: #4ADE80;
+  --chart-5: #B7A6F2;
+  --sidebar: #100C26;
+  --sidebar-foreground: #E7E3FB;
+  --sidebar-primary: #3FD1D3;
+  --sidebar-primary-foreground: #0E2E2F;
+  --sidebar-accent: #2A2160;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255,255,255,0.1);
+  --sidebar-ring: #3FD1D3;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
 }

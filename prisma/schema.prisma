@@ -1,0 +1,291 @@
+// PHAMORA Validation Portal — data model
+// Postgres (Neon), connected via DATABASE_URL.
+//
+// Fields that would be enums stay plain String columns — this schema was
+// originally developed against SQLite (no native enum support there) and
+// the string form is kept for continuity; valid values are documented
+// inline and enforced in application code.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth / roles
+// ---------------------------------------------------------------------------
+
+/// Investigator/admin accounts only. Students authenticate with a
+/// participant code + PIN (see Participant); experts authenticate via a
+/// unique invite-link token (see Expert) — neither needs a password.
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         String // "ADMIN"
+  createdAt    DateTime  @default(now())
+  lastLoginAt  DateTime?
+
+  auditLogs AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  target    String?
+  metadata  String? // JSON-encoded
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Study configuration
+// ---------------------------------------------------------------------------
+
+/// Single row investigators tune from /admin/settings.
+model StudySettings {
+  id                     String    @id @default("singleton")
+  consentVersion         String    @default("v1.0")
+  consentBody            String    @default("")
+  studyPeriodStart       DateTime?
+  studyPeriodEnd         DateTime?
+  studyInstructions      String?
+  randomizeQuestionOrder Boolean   @default(true)
+  randomizeOptionOrder   Boolean   @default(true)
+  preTestOpen            Boolean   @default(true)
+  postTestOpen           Boolean   @default(false)
+  usabilityOpen          Boolean   @default(false)
+  showSusScoreToStudent  Boolean   @default(false)
+  expertReviewOpen       Boolean   @default(true)
+  updatedAt              DateTime  @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Student / participant journey
+// ---------------------------------------------------------------------------
+
+/// studyStatus: "NOT_STARTED" | "CONSENTED" | "PRETEST_DONE" |
+/// "IN_STUDY_PERIOD" | "POSTTEST_DONE" | "USABILITY_DONE" |
+/// "APP_QUALITY_DONE" | "COMPLETED"
+///
+/// participantCode is the human-facing anonymous ID, e.g. PHA-STU-001.
+/// It is also the student's only "credential" — knowing the code plus a
+/// short personal PIN set at consent time is enough to resume the flow.
+model Participant {
+  id              String   @id @default(cuid())
+  participantCode String   @unique
+  pinHash         String
+  studyGroup      String? // e.g. "intervention" | "control", if a two-arm design is used
+  academicYear    String? // MBBS year / semester, free-form per admin config
+  isPilot         Boolean  @default(false)
+  studyStatus     String   @default("NOT_STARTED")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  consent             Consent?
+  profile             BaselineProfile?
+  assessmentSessions  AssessmentSession[]
+  susResponse         SusResponse?
+  appQualityResponses AppQualityResponse[]
+  feedback            Feedback?
+}
+
+model Consent {
+  id               String      @id @default(cuid())
+  participantId    String      @unique
+  participant      Participant @relation(fields: [participantId], references: [id])
+  consentVersion   String
+  informationRead  Boolean
+  voluntaryAgree   Boolean
+  consentTimestamp DateTime    @default(now())
+}
+
+model BaselineProfile {
+  id                        String      @id @default(cuid())
+  participantId             String      @unique
+  participant               Participant @relation(fields: [participantId], references: [id])
+  ageGroup                  String?
+  gender                    String?
+  mbbsYear                  String?
+  priorPharmacologyExposure Boolean?
+  priorPharmacologyExam     Boolean?
+  priorAppUse               Boolean?
+  digitalToolUseFrequency   String?
+  createdAt                 DateTime    @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Question bank + assessments (pre/post)
+// ---------------------------------------------------------------------------
+
+/// module: "GENERAL_PHARMACOLOGY" | "ANS" | "CARDIOVASCULAR" | "ANTIMICROBIALS"
+model Question {
+  id            String   @id @default(cuid())
+  module        String
+  questionText  String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctOption String // "A" | "B" | "C" | "D"
+  active        Boolean  @default(true)
+  version       String   @default("v1")
+  createdAt     DateTime @default(now())
+
+  responses AssessmentResponse[]
+}
+
+/// assessmentType: "PRETEST" | "POSTTEST"
+model AssessmentSession {
+  id             String      @id @default(cuid())
+  participantId  String
+  participant    Participant @relation(fields: [participantId], references: [id])
+  assessmentType String
+  startedAt      DateTime    @default(now())
+  completedAt    DateTime?
+  score          Int? // number_correct
+  totalQuestions Int?
+  percentage     Float?
+  isPilot        Boolean     @default(false)
+
+  responses AssessmentResponse[]
+
+  @@unique([participantId, assessmentType])
+}
+
+model AssessmentResponse {
+  id                  String            @id @default(cuid())
+  sessionId           String
+  session             AssessmentSession @relation(fields: [sessionId], references: [id])
+  questionId          String
+  question            Question          @relation(fields: [questionId], references: [id])
+  selectedOption      String?
+  correctOption       String
+  isCorrect           Boolean?
+  flagged             Boolean           @default(false)
+  questionStartedAt   DateTime?
+  answeredAt          DateTime?
+  responseTimeSeconds Int?
+
+  @@unique([sessionId, questionId])
+}
+
+// ---------------------------------------------------------------------------
+// SUS (System Usability Scale)
+// ---------------------------------------------------------------------------
+
+model SusResponse {
+  id            String      @id @default(cuid())
+  participantId String      @unique
+  participant   Participant @relation(fields: [participantId], references: [id])
+  q1            Int
+  q2            Int
+  q3            Int
+  q4            Int
+  q5            Int
+  q6            Int
+  q7            Int
+  q8            Int
+  q9            Int
+  q10           Int
+  susScore      Float
+  submittedAt   DateTime    @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// App Quality (uMARS-based) + Perceived Learning Impact
+// ---------------------------------------------------------------------------
+
+/// section: "ENGAGEMENT" | "FUNCTIONALITY" | "AESTHETICS" |
+/// "INFORMATION_QUALITY" | "SUBJECTIVE_QUALITY" | "PERCEIVED_IMPACT"
+model AppQualityResponse {
+  id            String      @id @default(cuid())
+  participantId String
+  participant   Participant @relation(fields: [participantId], references: [id])
+  section       String
+  itemId        String // e.g. "engagement_1"
+  itemLabel     String
+  response      Int // 1-5
+  submittedAt   DateTime    @default(now())
+
+  @@unique([participantId, itemId])
+}
+
+// ---------------------------------------------------------------------------
+// Qualitative feedback
+// ---------------------------------------------------------------------------
+
+model Feedback {
+  id                  String      @id @default(cuid())
+  participantId       String      @unique
+  participant         Participant @relation(fields: [participantId], references: [id])
+  likes               String?
+  difficulties        String?
+  usefulFeature       String?
+  improvementFeature  String?
+  suggestedFeature    String?
+  otherSuggestions    String?
+  overallSatisfaction Int? // 1-5
+  submittedAt         DateTime    @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Expert content validation (CVI)
+// ---------------------------------------------------------------------------
+
+/// Experts authenticate purely via inviteToken (a long random string in
+/// their personal /expert/invite/[token] link) — no password to manage for
+/// what is typically an 8-10 person panel.
+model Expert {
+  id                        String    @id @default(cuid())
+  expertCode                String    @unique // e.g. PHA-EXP-01
+  inviteToken               String    @unique
+  email                     String?
+  designation               String?
+  department                String?
+  speciality                String?
+  yearsOfExperience         Int?
+  yearsOfTeachingExperience Int?
+  medEdExperience           String?
+  institution               String?
+  profileCompletedAt        DateTime?
+  invitedAt                 DateTime  @default(now())
+
+  ratings ExpertCviRating[]
+}
+
+/// module: "GENERAL_PHARMACOLOGY" | "ANS" | "CARDIOVASCULAR" | "ANTIMICROBIALS"
+/// contentType: "lesson" | "mcq" | "monograph" | "case"
+model ContentItem {
+  id           String   @id @default(cuid())
+  module       String
+  contentType  String
+  contentTitle String
+  contentText  String
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  ratings ExpertCviRating[]
+}
+
+model ExpertCviRating {
+  id            String      @id @default(cuid())
+  expertId      String
+  expert        Expert      @relation(fields: [expertId], references: [id])
+  contentItemId String
+  contentItem   ContentItem @relation(fields: [contentItemId], references: [id])
+  rating        Int // 1-4
+  comment       String?
+  submittedAt   DateTime    @default(now())
+
+  @@unique([expertId, contentItemId])
+}
+
+// I-CVI / S-CVI/Ave / S-CVI/UA and per-item CVI status are derived, not
+// stored — computed on read from ExpertCviRating (src/lib/scoring.ts) so
+// they always reflect the latest ratings.

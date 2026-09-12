@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img">
+<defs>
+<linearGradient id="purpleGrad" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0%" stop-color="#3F2BA8"/>
+  <stop offset="55%" stop-color="#5B3FD6"/>
+  <stop offset="100%" stop-color="#7C5CE8"/>
+</linearGradient>
+<linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0%" stop-color="#1AB6B8"/>
+  <stop offset="100%" stop-color="#7BE0D9"/>
+</linearGradient>
+<filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+  <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#3F2BA8" flood-opacity=".18"/>
+</filter>
+</defs>
+
+<g filter="url(#shadow)" transform="translate(88 62)">
+  <!-- open book -->
+  <path d="M150 596 C275 530 390 548 424 602 L424 746 C335 690 242 690 132 752 Z"
+        fill="#FFFFFF" stroke="#3F2BA8" stroke-width="30" stroke-linejoin="round"/>
+  <path d="M424 602 C478 548 593 530 718 596 L736 752 C626 690 533 690 424 746 Z"
+        fill="#FFFFFF" stroke="#3F2BA8" stroke-width="30" stroke-linejoin="round"/>
+  <path d="M424 610 L424 742" stroke="#3F2BA8" stroke-width="24" stroke-linecap="round"/>
+  <path d="M172 650 C260 612 342 616 398 655" fill="none" stroke="url(#tealGrad)" stroke-width="18" stroke-linecap="round"/>
+  <path d="M450 655 C506 616 588 612 676 650" fill="none" stroke="url(#tealGrad)" stroke-width="18" stroke-linecap="round"/>
+  <!-- capsule -->
+  <g transform="rotate(-43 420 330)">
+    <rect x="260" y="120" width="330" height="210" rx="105" fill="url(#purpleGrad)" stroke="#3F2BA8" stroke-width="22"/>
+    <path d="M425 120 V330" stroke="#FFFFFF" stroke-width="20"/>
+    <path d="M278 225 H572" stroke="#FFFFFF" stroke-opacity=".18" stroke-width="16"/>
+    <path d="M315 155 C350 130 390 128 425 128" fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round" opacity=".75"/>
+    <path d="M425 120 H485 C543 120 590 167 590 225 C590 283 543 330 485 330 H425 Z" fill="url(#tealGrad)" opacity=".95"/>
+  </g>
+  <!-- molecular nodes -->
+  <g fill="url(#tealGrad)" stroke="#3F2BA8" stroke-width="10">
+    <circle cx="164" cy="285" r="22"/><circle cx="105" cy="235" r="16"/><circle cx="97" cy="325" r="14"/>
+    <line x1="147" y1="270" x2="118" y2="246"/><line x1="146" y1="296" x2="113" y2="318"/>
+    <circle cx="680" cy="323" r="18"/><circle cx="734" cy="280" r="13"/>
+    <line x1="695" y1="312" x2="723" y2="290"/>
+  </g>
+</g>
+</svg>
