@@ -15,5 +15,14 @@ export async function GET(
       : "/expert/profile"
     : "/expert?error=invalid_invite";
 
-  return NextResponse.redirect(new URL(destination, request.url));
+  // request.url resolves against the container's internal address on some
+  // hosts (observed on Render: localhost:PORT instead of the public
+  // domain) inside Route Handlers specifically — proxy.ts's request.url is
+  // unaffected, but here we rebuild the origin from the forwarded-host
+  // header a reverse proxy sets, which is reliably correct.
+  const forwardedHost = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") ?? "https";
+  const origin = forwardedHost ? `${forwardedProto}://${forwardedHost}` : request.url;
+
+  return NextResponse.redirect(new URL(destination, origin));
 }

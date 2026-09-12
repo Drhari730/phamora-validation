@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { ClientRedirect } from "@/components/pharma/client-redirect";
 import {
   UserRound,
   ListChecks,
@@ -28,7 +28,7 @@ interface StageCard {
 
 export default async function StudentDashboard() {
   const state = await getParticipantState();
-  if (!state) redirect("/student/consent");
+  if (!state) return <ClientRedirect to="/student/consent" />;
 
   const settings = await prisma.studySettings.findUnique({ where: { id: "singleton" } });
 
