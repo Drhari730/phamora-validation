@@ -7,6 +7,7 @@ import {
   Pill,
   BarChart3,
   ClipboardCheck,
+  Smartphone,
 } from "lucide-react";
 import { Logo } from "@/components/pharma/logo";
 import { Badge } from "@/components/ui/badge";
@@ -126,6 +127,24 @@ export default function Home() {
               </div>
             </Link>
           ))}
+        </section>
+
+        <section className="pb-24">
+          <Link
+            href="/download"
+            className="group mx-auto flex max-w-2xl items-center justify-between gap-4 rounded-2xl border border-border bg-card px-6 py-4 shadow-sm transition-colors hover:border-accent/30 hover:bg-secondary"
+          >
+            <div className="flex items-center gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent/10 text-accent">
+                <Smartphone size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Download PHAMORA to test on your device</p>
+                <p className="text-xs text-muted-foreground">Android only · install &amp; setup instructions included</p>
+              </div>
+            </div>
+            <ArrowRight size={16} className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
+          </Link>
         </section>
       </main>
 

@@ -1,4 +1,4 @@
-import { CalendarRange, CheckCircle2, Info } from "lucide-react";
+import { CalendarRange, CheckCircle2, Info, Smartphone } from "lucide-react";
 import { Logo } from "@/components/pharma/logo";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -68,6 +68,19 @@ export default async function StudyPeriodPage() {
             </p>
           </div>
         </div>
+
+        <Link
+          href="/download"
+          className="mb-6 flex items-center gap-3 rounded-2xl border border-accent/25 bg-accent/5 px-5 py-4 text-left transition-colors hover:bg-accent/10"
+        >
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent/15 text-accent">
+            <Smartphone size={16} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Haven't installed PHAMORA yet?</p>
+            <p className="text-xs text-muted-foreground">Android only · download &amp; setup instructions</p>
+          </div>
+        </Link>
 
         <Link href="/student/dashboard">
           <Button variant="outline" className="rounded-full">

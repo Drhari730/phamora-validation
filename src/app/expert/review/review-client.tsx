@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
-import { ChevronLeft, ChevronRight, CircleCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleCheck, Smartphone } from "lucide-react";
 import { Logo } from "@/components/pharma/logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -84,6 +85,20 @@ export function ReviewClient({ data }: { data: ReviewData }) {
             Rate each content item for relevance to undergraduate pharmacology education.
           </p>
         </div>
+
+        <Link
+          href="/download"
+          className="mb-8 flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-3.5 text-left transition-colors hover:bg-secondary"
+        >
+          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent">
+            <Smartphone size={14} />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">Optional: </span>
+            try PHAMORA hands-on before rating (Android only) — no installation
+            needed to complete your review.
+          </p>
+        </Link>
 
         <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {moduleProgress.map(([mod, p]) => (

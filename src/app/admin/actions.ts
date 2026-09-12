@@ -178,6 +178,7 @@ export async function getExpertsTable() {
 
   return experts.map((e) => ({
     code: e.expertCode,
+    email: e.email,
     discipline: e.speciality ?? "—",
     assigned: totalItems,
     completed: e.ratings.length,
@@ -223,6 +224,7 @@ export async function getCviData() {
 }
 
 export async function inviteExpert(input: {
+  email?: string;
   speciality?: string;
   designation?: string;
   department?: string;
@@ -235,6 +237,7 @@ export async function inviteExpert(input: {
     data: {
       expertCode: code,
       inviteToken: generateInviteToken(),
+      email: input.email,
       speciality: input.speciality,
       designation: input.designation,
       department: input.department,

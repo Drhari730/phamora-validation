@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Mail, Microscope, Copy, Check, Plus } from "lucide-react";
+import { Mail, Microscope, Copy, Check, Plus, Send } from "lucide-react";
 import { AdminShell } from "@/components/pharma/admin-shell";
 import { StatCard } from "@/components/pharma/stat-card";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +29,27 @@ import type { getExpertsTable } from "../actions";
 
 type Row = Awaited<ReturnType<typeof getExpertsTable>>[number];
 
+function inviteEmailDraft(link: string) {
+  const subject = "Invitation: PHAMORA Expert Content Validation Panel";
+  const body = `Dear Colleague,
+
+You are invited to join the expert panel validating the content of PHAMORA, an offline pharmacology learning app for undergraduate medical students, as part of a formal Content Validity Index (CVI) study.
+
+Your task is to rate a set of lessons, MCQs and monographs (~10-30 minutes) for relevance to the undergraduate pharmacology curriculum. No installation or account is needed — everything happens through your personal review link below.
+
+Your personal review link:
+${link}
+
+This link is unique to you — please do not share it. If you have any questions, feel free to reply to this email.
+
+Thank you for contributing your expertise to this study.
+
+Best regards,
+Dr. G. Hari Prakash
+Principal Investigator, PHAMORA Validation Study`;
+  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 export function ExpertsClient({ rows, origin }: { rows: Row[]; origin: string }) {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const totalAssigned = rows.reduce((a, e) => a + e.assigned, 0);
@@ -48,7 +69,7 @@ export function ExpertsClient({ rows, origin }: { rows: Row[]; origin: string })
           <h1 className="font-heading text-xl font-bold sm:text-2xl">Experts</h1>
           <p className="text-xs text-muted-foreground">Content Validity Index (CVI) panel</p>
         </div>
-        <InviteDialog />
+        <InviteDialog origin={origin} />
       </header>
 
       <main className="px-6 py-8 sm:px-8">
@@ -73,12 +94,13 @@ export function ExpertsClient({ rows, origin }: { rows: Row[]; origin: string })
                   <TableHead>Items Assigned</TableHead>
                   <TableHead>Items Completed</TableHead>
                   <TableHead>Completion</TableHead>
-                  <TableHead>Invite Link</TableHead>
+                  <TableHead>Invite</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rows.map((e) => {
                   const pct = e.assigned ? Math.round((e.completed / e.assigned) * 100) : 0;
+                  const link = `${origin}/expert/invite/${e.inviteToken}`;
                   return (
                     <TableRow key={e.code}>
                       <TableCell className="font-mono text-xs font-medium">{e.code}</TableCell>
@@ -92,13 +114,25 @@ export function ExpertsClient({ rows, origin }: { rows: Row[]; origin: string })
                         </div>
                       </TableCell>
                       <TableCell>
-                        <button
-                          onClick={() => copyLink(e.inviteToken, e.code)}
-                          className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
-                        >
-                          {copiedCode === e.code ? <Check size={13} /> : <Copy size={13} />}
-                          {copiedCode === e.code ? "Copied" : "Copy link"}
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => copyLink(e.inviteToken, e.code)}
+                            className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                          >
+                            {copiedCode === e.code ? <Check size={13} /> : <Copy size={13} />}
+                            {copiedCode === e.code ? "Copied" : "Copy"}
+                          </button>
+                          <a
+                            href={
+                              e.email
+                                ? inviteEmailDraft(link).replace("mailto:?", `mailto:${encodeURIComponent(e.email)}?`)
+                                : inviteEmailDraft(link)
+                            }
+                            className="flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
+                          >
+                            <Mail size={13} /> Email
+                          </a>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -119,32 +153,40 @@ export function ExpertsClient({ rows, origin }: { rows: Row[]; origin: string })
   );
 }
 
-function InviteDialog() {
+function InviteDialog({ origin }: { origin: string }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [email, setEmail] = useState("");
   const [speciality, setSpeciality] = useState("");
   const [designation, setDesignation] = useState("");
   const [department, setDepartment] = useState("");
   const [result, setResult] = useState<{ expertCode: string; inviteToken: string } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   function handleInvite() {
     startTransition(async () => {
-      const res = await inviteExpert({ speciality, designation, department });
+      const res = await inviteExpert({ email, speciality, designation, department });
       if (res.ok) setResult(res);
     });
   }
+
+  function reset() {
+    setResult(null);
+    setEmail("");
+    setSpeciality("");
+    setDesignation("");
+    setDepartment("");
+    setCopied(false);
+  }
+
+  const link = result ? `${origin}/expert/invite/${result.inviteToken}` : "";
 
   return (
     <Dialog
       open={open}
       onOpenChange={(o) => {
         setOpen(o);
-        if (!o) {
-          setResult(null);
-          setSpeciality("");
-          setDesignation("");
-          setDepartment("");
-        }
+        if (!o) reset();
       }}
     >
       <DialogTrigger render={<Button className="gap-2 rounded-full" />}>
@@ -157,6 +199,12 @@ function InviteDialog() {
         <div className="flex flex-col gap-4 px-4 pb-4">
           {!result ? (
             <>
+              <div>
+                <Label className="mb-2 text-sm font-medium">
+                  Email <span className="font-normal text-muted-foreground">(optional, for a ready-to-send invite)</span>
+                </Label>
+                <Input value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl" placeholder="expert@institution.edu" />
+              </div>
               <div>
                 <Label className="mb-2 text-sm font-medium">Speciality</Label>
                 <Input value={speciality} onChange={(e) => setSpeciality(e.target.value)} className="rounded-xl" placeholder="e.g. Pharmacology" />
@@ -174,12 +222,38 @@ function InviteDialog() {
               </Button>
             </>
           ) : (
-            <div className="rounded-2xl bg-secondary p-4 text-sm">
-              <p className="mb-2 font-semibold">{result.expertCode} created.</p>
-              <p className="mb-1 text-xs text-muted-foreground">Share this link with the expert:</p>
-              <code className="block break-all rounded-lg bg-card p-2 text-xs">
-                {typeof window !== "undefined" ? window.location.origin : ""}/expert/invite/{result.inviteToken}
-              </code>
+            <div className="flex flex-col gap-4">
+              <div className="rounded-2xl bg-secondary p-4 text-sm">
+                <p className="mb-2 font-semibold">{result.expertCode} created.</p>
+                <code className="block break-all rounded-lg bg-card p-2 text-xs">{link}</code>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2 rounded-full"
+                  onClick={() => {
+                    navigator.clipboard.writeText(link);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1500);
+                  }}
+                >
+                  {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Copied" : "Copy Link"}
+                </Button>
+                <a
+                  href={
+                    email
+                      ? inviteEmailDraft(link).replace("mailto:?", `mailto:${encodeURIComponent(email)}?`)
+                      : inviteEmailDraft(link)
+                  }
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                >
+                  <Send size={14} /> Open Email Draft
+                </a>
+              </div>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                Opens a pre-filled email in your own mail app{email ? ` addressed to ${email}` : ""} —
+                nothing is sent automatically.
+              </p>
             </div>
           )}
         </div>
