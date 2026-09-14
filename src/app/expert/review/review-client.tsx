@@ -11,15 +11,11 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { submitCviRating } from "../actions";
 import type { getExpertReviewData } from "../actions";
+import { CVI_RATING_SCALE } from "@/lib/instruments";
 
 type ReviewData = NonNullable<Awaited<ReturnType<typeof getExpertReviewData>>>;
 
-const ratingScale = [
-  { value: 1, label: "Not Relevant" },
-  { value: 2, label: "Needs Major Revision" },
-  { value: 3, label: "Relevant, Minor Revision" },
-  { value: 4, label: "Highly Relevant" },
-];
+const ratingScale = CVI_RATING_SCALE;
 
 const moduleLabels: Record<string, string> = {
   GENERAL_PHARMACOLOGY: "General Pharmacology",

@@ -7,27 +7,7 @@ import { LikertScale } from "@/components/pharma/likert-scale";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { submitSus } from "../actions";
-
-const susLikert: [string, string, string, string, string] = [
-  "Strongly Disagree",
-  "Disagree",
-  "Neutral",
-  "Agree",
-  "Strongly Agree",
-];
-
-const susItems = [
-  "I think that I would like to use PHAMORA frequently.",
-  "I found PHAMORA unnecessarily complex.",
-  "I thought PHAMORA was easy to use.",
-  "I think that I would need the support of a technical person to be able to use PHAMORA.",
-  "I found the various functions in PHAMORA were well integrated.",
-  "I thought there was too much inconsistency in PHAMORA.",
-  "I would imagine that most medical students would learn to use PHAMORA very quickly.",
-  "I found PHAMORA very cumbersome to use.",
-  "I felt very confident using PHAMORA.",
-  "I needed to learn a lot of things before I could get going with PHAMORA.",
-];
+import { SUS_ITEMS, LIKERT_AGREEMENT } from "@/lib/instruments";
 
 export default function UsabilityPage() {
   const router = useRouter();
@@ -56,7 +36,7 @@ export default function UsabilityPage() {
       </p>
 
       <div className="flex flex-col gap-4">
-        {susItems.map((text, i) => (
+        {SUS_ITEMS.map((text, i) => (
           <div key={i} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <p className="mb-4 text-sm font-medium leading-relaxed">
               <span className="mr-2 text-muted-foreground">{i + 1}.</span>
@@ -65,7 +45,7 @@ export default function UsabilityPage() {
             <LikertScale
               value={answers[i]}
               onChange={(v) => setAnswers((p) => ({ ...p, [i]: v }))}
-              labels={susLikert}
+              labels={LIKERT_AGREEMENT}
             />
           </div>
         ))}

@@ -254,6 +254,11 @@ export async function getQuestions() {
   return prisma.question.findMany({ orderBy: { createdAt: "asc" } });
 }
 
+export async function getContentItemsList() {
+  await requireAdmin();
+  return prisma.contentItem.findMany({ orderBy: { createdAt: "asc" } });
+}
+
 export async function toggleQuestionActive(id: string) {
   await requireAdmin();
   const q = await prisma.question.findUniqueOrThrow({ where: { id } });

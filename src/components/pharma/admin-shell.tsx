@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/pharma/logo";
 import { cn } from "@/lib/utils";
+import { adminLogout } from "@/app/admin/actions";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -27,6 +29,16 @@ const navItems = [
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+
+  function handleLogout() {
+    startTransition(async () => {
+      await adminLogout();
+      router.push("/admin");
+      router.refresh();
+    });
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -62,7 +74,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <p className="truncate text-xs font-semibold">Dr. G. Hari Prakash</p>
             <p className="truncate text-[11px] text-sidebar-foreground/60">Principal Investigator</p>
           </div>
-          <LogOut size={15} className="shrink-0 text-sidebar-foreground/50" />
+          <button
+            onClick={handleLogout}
+            disabled={pending}
+            aria-label="Sign out"
+            className="shrink-0 text-sidebar-foreground/50 transition-colors hover:text-sidebar-foreground disabled:opacity-50"
+          >
+            <LogOut size={15} />
+          </button>
         </div>
       </aside>
       <div className="flex-1 lg:pl-64">{children}</div>

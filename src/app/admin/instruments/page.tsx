@@ -1,9 +1,9 @@
-import { getQuestions } from "../actions";
+import { getQuestions, getContentItemsList } from "../actions";
 import { InstrumentsClient } from "./instruments-client";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminInstrumentsPage() {
-  const questions = await getQuestions();
-  return <InstrumentsClient initialQuestions={questions} />;
+  const [questions, contentItems] = await Promise.all([getQuestions(), getContentItemsList()]);
+  return <InstrumentsClient initialQuestions={questions} contentItems={contentItems} />;
 }

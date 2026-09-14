@@ -8,93 +8,7 @@ import { LikertScale } from "@/components/pharma/likert-scale";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { submitAppQuality } from "../actions";
-
-const qualityLikert: [string, string, string, string, string] = [
-  "Inadequate",
-  "Poor",
-  "Acceptable",
-  "Good",
-  "Excellent",
-];
-
-const agreementLikert: [string, string, string, string, string] = [
-  "Strongly Disagree",
-  "Disagree",
-  "Neutral",
-  "Agree",
-  "Strongly Agree",
-];
-
-const sections = [
-  {
-    key: "engagement",
-    title: "Engagement",
-    labels: qualityLikert,
-    items: [
-      "Entertainment — Is PHAMORA fun/engaging to use? Does it use gamification (streaks, badges, progress) effectively?",
-      "Interest — Was the content presented in an interesting way?",
-      "Customization — Does the app adapt to your own progress/performance (e.g., spaced-repetition flashcards, stats)?",
-      "Interactivity — Does it prompt input, give feedback, track progress, or notify you appropriately?",
-      "Target group — Is the content appropriate and pitched correctly for undergraduate medical students?",
-    ],
-  },
-  {
-    key: "functionality",
-    title: "Functionality",
-    labels: qualityLikert,
-    items: [
-      "Performance — Do the app's features (quizzes, search, flashcards) work accurately and load quickly?",
-      "Ease of use — Is it easy to learn how to use PHAMORA, with clear menus/labels?",
-      "Navigation — Is it easy to move between lessons, quizzes, cases, and monographs?",
-      "Gestural design — Are taps/swipes/scrolls consistent and intuitive throughout the app?",
-    ],
-  },
-  {
-    key: "aesthetics",
-    title: "Aesthetics",
-    labels: qualityLikert,
-    items: [
-      "Layout — Are graphics and menus well organized and sized appropriately?",
-      "Graphics — Is the visual quality of icons/illustrations/charts good?",
-      "Visual appeal — Overall, how good does PHAMORA look?",
-    ],
-  },
-  {
-    key: "information",
-    title: "Information Quality",
-    labels: qualityLikert,
-    items: [
-      "Quality of information — Is the pharmacology content correct, well written, and clinically relevant?",
-      "Quantity of information — Is the amount of content in each lesson/monograph appropriate (not too little/too much)?",
-      "Visual information — Are charts, tables and mechanism diagrams clear and well designed?",
-      "Goal clarity — Does each lesson/case have a clear, specific learning objective?",
-    ],
-  },
-  {
-    key: "subjective",
-    title: "Subjective Quality",
-    labels: qualityLikert,
-    items: [
-      "Would you recommend PHAMORA to fellow medical students?",
-      "How many times do you think you would use PHAMORA in the next 12 months?",
-      "Would you pay for this app? (rate perceived value even if free)",
-      "Overall star rating you would give PHAMORA.",
-    ],
-  },
-  {
-    key: "impact",
-    title: "Perceived Learning Impact",
-    labels: agreementLikert,
-    items: [
-      "Using PHAMORA increased my awareness of key pharmacology concepts.",
-      "Using PHAMORA increased my knowledge of drug mechanisms/interactions/ADRs.",
-      "PHAMORA changed my attitude toward the importance of pharmacology in clinical practice.",
-      "Using PHAMORA increased my confidence in applying pharmacology to clinical (case-based) reasoning.",
-      "I intend to keep using PHAMORA for exam preparation / clinical rotations.",
-      "Overall, PHAMORA is likely to improve learning outcomes compared to my usual study methods.",
-    ],
-  },
-];
+import { APP_QUALITY_SECTIONS } from "@/lib/instruments";
 
 export default function AppQualityPage() {
   const router = useRouter();
@@ -102,15 +16,15 @@ export default function AppQualityPage() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [pending, startTransition] = useTransition();
 
-  const section = sections[sectionIndex];
+  const section = APP_QUALITY_SECTIONS[sectionIndex];
   const sectionAnswered = section.items.every((_, i) => answers[`${section.key}_${i}`] !== undefined);
-  const isLast = sectionIndex === sections.length - 1;
+  const isLast = sectionIndex === APP_QUALITY_SECTIONS.length - 1;
 
   function handleFinish() {
     startTransition(async () => {
-      const responses = sections.flatMap((s) =>
+      const responses = APP_QUALITY_SECTIONS.flatMap((s) =>
         s.items.map((text, i) => ({
-          section: s.key.toUpperCase() === "IMPACT" ? "PERCEIVED_IMPACT" : s.key.toUpperCase() === "INFORMATION" ? "INFORMATION_QUALITY" : s.key.toUpperCase(),
+          section: s.dbSection,
           itemId: `${s.key}_${i}`,
           itemLabel: text,
           response: answers[`${s.key}_${i}`],
@@ -133,7 +47,7 @@ export default function AppQualityPage() {
       </p>
 
       <div className="mb-8 flex flex-wrap gap-2">
-        {sections.map((s, i) => (
+        {APP_QUALITY_SECTIONS.map((s, i) => (
           <button
             key={s.key}
             onClick={() => setSectionIndex(i)}
@@ -187,7 +101,7 @@ export default function AppQualityPage() {
           <Button
             className="rounded-full"
             disabled={!sectionAnswered}
-            onClick={() => setSectionIndex((i) => Math.min(sections.length - 1, i + 1))}
+            onClick={() => setSectionIndex((i) => Math.min(APP_QUALITY_SECTIONS.length - 1, i + 1))}
           >
             Next Section <ChevronRight size={16} />
           </Button>
