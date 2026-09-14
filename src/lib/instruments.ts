@@ -54,12 +54,23 @@ export const SUS_ITEMS = [
   "I needed to learn a lot of things before I could get going with PHAMORA.",
 ];
 
+export interface AppQualityItem {
+  text: string;
+  // Per-item response anchors. Only the Subjective Quality subscale
+  // overrides these — in the published uMARS, that subscale's 4 items
+  // each ask a concretely different question (recommend / frequency /
+  // pay / star rating), so reusing the generic Inadequate→Excellent
+  // quality anchors there is a scoring convenience, not the actual
+  // instrument wording. When omitted, the section's `labels` apply.
+  labels?: [string, string, string, string, string];
+}
+
 export interface AppQualitySection {
   key: string;
   dbSection: string;
   title: string;
   labels: [string, string, string, string, string];
-  items: string[];
+  items: AppQualityItem[];
 }
 
 export const APP_QUALITY_SECTIONS: AppQualitySection[] = [
@@ -69,11 +80,11 @@ export const APP_QUALITY_SECTIONS: AppQualitySection[] = [
     title: "Engagement",
     labels: LIKERT_QUALITY,
     items: [
-      "Entertainment — Is PHAMORA fun/engaging to use? Does it use gamification (streaks, badges, progress) effectively?",
-      "Interest — Was the content presented in an interesting way?",
-      "Customization — Does the app adapt to your own progress/performance (e.g., spaced-repetition flashcards, stats)?",
-      "Interactivity — Does it prompt input, give feedback, track progress, or notify you appropriately?",
-      "Target group — Is the content appropriate and pitched correctly for undergraduate health-professions students (MBBS, BDS, Pharmacy, Nursing)?",
+      { text: "Entertainment — Is PHAMORA fun/engaging to use? Does it use gamification (streaks, badges, progress) effectively?" },
+      { text: "Interest — Was the content presented in an interesting way?" },
+      { text: "Customization — Does the app adapt to your own progress/performance (e.g., spaced-repetition flashcards, stats)?" },
+      { text: "Interactivity — Does it prompt input, give feedback, track progress, or notify you appropriately?" },
+      { text: "Target group — Is the content appropriate and pitched correctly for undergraduate health-professions students (MBBS, BDS, Pharmacy, Nursing)?" },
     ],
   },
   {
@@ -82,10 +93,10 @@ export const APP_QUALITY_SECTIONS: AppQualitySection[] = [
     title: "Functionality",
     labels: LIKERT_QUALITY,
     items: [
-      "Performance — Do the app's features (quizzes, search, flashcards) work accurately and load quickly?",
-      "Ease of use — Is it easy to learn how to use PHAMORA, with clear menus/labels?",
-      "Navigation — Is it easy to move between lessons, quizzes, cases, and monographs?",
-      "Gestural design — Are taps/swipes/scrolls consistent and intuitive throughout the app?",
+      { text: "Performance — Do the app's features (quizzes, search, flashcards) work accurately and load quickly?" },
+      { text: "Ease of use — Is it easy to learn how to use PHAMORA, with clear menus/labels?" },
+      { text: "Navigation — Is it easy to move between lessons, quizzes, cases, and monographs?" },
+      { text: "Gestural design — Are taps/swipes/scrolls consistent and intuitive throughout the app?" },
     ],
   },
   {
@@ -94,9 +105,9 @@ export const APP_QUALITY_SECTIONS: AppQualitySection[] = [
     title: "Aesthetics",
     labels: LIKERT_QUALITY,
     items: [
-      "Layout — Are graphics and menus well organized and sized appropriately?",
-      "Graphics — Is the visual quality of icons/illustrations/charts good?",
-      "Visual appeal — Overall, how good does PHAMORA look?",
+      { text: "Layout — Are graphics and menus well organized and sized appropriately?" },
+      { text: "Graphics — Is the visual quality of icons/illustrations/charts good?" },
+      { text: "Visual appeal — Overall, how good does PHAMORA look?" },
     ],
   },
   {
@@ -105,10 +116,10 @@ export const APP_QUALITY_SECTIONS: AppQualitySection[] = [
     title: "Information Quality",
     labels: LIKERT_QUALITY,
     items: [
-      "Quality of information — Is the pharmacology content correct, well written, and clinically relevant?",
-      "Quantity of information — Is the amount of content in each lesson/monograph appropriate (not too little/too much)?",
-      "Visual information — Are charts, tables and mechanism diagrams clear and well designed?",
-      "Goal clarity — Does each lesson/case have a clear, specific learning objective?",
+      { text: "Quality of information — Is the pharmacology content correct, well written, and clinically relevant?" },
+      { text: "Quantity of information — Is the amount of content in each lesson/monograph appropriate (not too little/too much)?" },
+      { text: "Visual information — Are charts, tables and mechanism diagrams clear and well designed?" },
+      { text: "Goal clarity — Does each lesson/case have a clear, specific learning objective?" },
     ],
   },
   {
@@ -117,10 +128,34 @@ export const APP_QUALITY_SECTIONS: AppQualitySection[] = [
     title: "Subjective Quality",
     labels: LIKERT_QUALITY,
     items: [
-      "Would you recommend PHAMORA to fellow students?",
-      "How many times do you think you would use PHAMORA in the next 12 months?",
-      "Would you pay for this app? (rate perceived value even if free)",
-      "Overall star rating you would give PHAMORA.",
+      {
+        text: "Would you recommend PHAMORA to fellow students?",
+        labels: [
+          "Not at all",
+          "Only to very few",
+          "Maybe — to several people",
+          "Yes, to many people",
+          "Yes, to everyone",
+        ],
+      },
+      {
+        text: "How many times do you think you would use PHAMORA in the next 12 months?",
+        labels: ["None", "1–2 times", "3–10 times", "10–50 times", "More than 50 times"],
+      },
+      {
+        text: "Would you pay for this app?",
+        labels: [
+          "No",
+          "No, I would want it to stay free",
+          "Not sure",
+          "Maybe",
+          "Yes",
+        ],
+      },
+      {
+        text: "Overall star rating you would give PHAMORA.",
+        labels: ["1 star", "2 stars", "3 stars", "4 stars", "5 stars"],
+      },
     ],
   },
   {
@@ -129,12 +164,12 @@ export const APP_QUALITY_SECTIONS: AppQualitySection[] = [
     title: "Perceived Learning Impact",
     labels: LIKERT_AGREEMENT,
     items: [
-      "Using PHAMORA increased my awareness of key pharmacology concepts.",
-      "Using PHAMORA increased my knowledge of drug mechanisms/interactions/ADRs.",
-      "PHAMORA changed my attitude toward the importance of pharmacology in clinical practice.",
-      "Using PHAMORA increased my confidence in applying pharmacology to clinical (case-based) reasoning.",
-      "I intend to keep using PHAMORA for exam preparation / clinical rotations.",
-      "Overall, PHAMORA is likely to improve learning outcomes compared to my usual study methods.",
+      { text: "Using PHAMORA increased my awareness of key pharmacology concepts." },
+      { text: "Using PHAMORA increased my knowledge of drug mechanisms/interactions/ADRs." },
+      { text: "PHAMORA changed my attitude toward the importance of pharmacology in clinical practice." },
+      { text: "Using PHAMORA increased my confidence in applying pharmacology to clinical (case-based) reasoning." },
+      { text: "I intend to keep using PHAMORA for exam preparation / clinical rotations." },
+      { text: "Overall, PHAMORA is likely to improve learning outcomes compared to my usual study methods." },
     ],
   },
 ];

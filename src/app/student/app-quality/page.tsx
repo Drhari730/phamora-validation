@@ -23,10 +23,10 @@ export default function AppQualityPage() {
   function handleFinish() {
     startTransition(async () => {
       const responses = APP_QUALITY_SECTIONS.flatMap((s) =>
-        s.items.map((text, i) => ({
+        s.items.map((item, i) => ({
           section: s.dbSection,
           itemId: `${s.key}_${i}`,
-          itemLabel: text,
+          itemLabel: item.text,
           response: answers[`${s.key}_${i}`],
         }))
       );
@@ -66,15 +66,15 @@ export default function AppQualityPage() {
       </div>
 
       <div className="flex flex-col gap-4">
-        {section.items.map((text, i) => (
+        {section.items.map((item, i) => (
           <div key={i} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <p className="mb-4 text-sm font-medium leading-relaxed">{text}</p>
+            <p className="mb-4 text-sm font-medium leading-relaxed">{item.text}</p>
             <LikertScale
               value={answers[`${section.key}_${i}`]}
               onChange={(v) =>
                 setAnswers((p) => ({ ...p, [`${section.key}_${i}`]: v }))
               }
-              labels={section.labels}
+              labels={item.labels ?? section.labels}
             />
           </div>
         ))}

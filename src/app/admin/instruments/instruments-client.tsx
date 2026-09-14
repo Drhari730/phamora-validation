@@ -206,10 +206,17 @@ export function InstrumentsClient({
                   </div>
                   <Table>
                     <TableBody>
-                      {section.items.map((text, i) => (
+                      {section.items.map((item, i) => (
                         <TableRow key={i}>
                           <TableCell className="w-8 text-xs text-muted-foreground">{i + 1}</TableCell>
-                          <TableCell className="text-sm">{text}</TableCell>
+                          <TableCell className="text-sm">
+                            {item.text}
+                            {item.labels && (
+                              <div className="mt-1 text-[11px] text-muted-foreground">
+                                Response options: {item.labels.join(" · ")}
+                              </div>
+                            )}
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
