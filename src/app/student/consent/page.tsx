@@ -75,14 +75,16 @@ export default function ConsentPage() {
           <h2 className="mb-2 font-heading text-base font-bold">Study Title</h2>
           <p className="mb-6 text-sm text-muted-foreground">
             Evaluation of Usability, Educational Effectiveness and Content Validity of the PHAMORA
-            Pharmacology Learning Application among Undergraduate Medical Students.
+            Pharmacology Learning Application among Undergraduate Health-Professions Students
+            (MBBS, BDS, Pharmacy/Pharm.D, and Nursing).
           </p>
 
           <h2 className="mb-2 font-heading text-base font-bold">Purpose</h2>
           <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
             This study evaluates whether PHAMORA, an offline pharmacology learning app, is accurate,
-            usable and effective for undergraduate medical education. Your participation will help
-            validate the app for wider curricular use.
+            usable and effective for undergraduate pharmacology education across medical, dental,
+            pharmacy and nursing programs. Your participation will help validate the app for wider
+            curricular use.
           </p>
 
           <h2 className="mb-2 font-heading text-base font-bold">What participation involves</h2>

@@ -57,6 +57,7 @@ export async function submitConsent(input: {
 export async function submitProfile(input: {
   ageGroup?: string;
   gender?: string;
+  program?: string;
   mbbsYear?: string;
   digitalToolUseFrequency?: string;
   priorPharmacologyExposure?: boolean;

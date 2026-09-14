@@ -15,18 +15,20 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import { PROGRAMS, YEARS_OF_STUDY } from "@/lib/programs";
 
 const fields = [
   { key: "ageGroup", label: "Age group", options: ["18–20", "21–23", "24–26", "27+"] },
   { key: "gender", label: "Gender", options: ["Male", "Female", "Prefer not to say"] },
-  { key: "mbbsYear", label: "MBBS year / semester", options: ["2nd Year", "3rd Year", "Final Year", "Internship"] },
+  { key: "program", label: "Program / Course", options: [...PROGRAMS] },
+  { key: "mbbsYear", label: "Year of study", options: [...YEARS_OF_STUDY] },
   { key: "digitalToolUseFrequency", label: "How often do you use digital learning tools?", options: ["Daily", "A few times a week", "Rarely", "Never"] },
 ];
 
 const yesNoFields = [
   { key: "priorPharmacologyExposure", label: "Have you previously studied pharmacology?" },
   { key: "priorPharmacologyExam", label: "Have you completed a pharmacology examination?" },
-  { key: "priorAppUse", label: "Have you used a medical-learning app before?" },
+  { key: "priorAppUse", label: "Have you used a health-education learning app before?" },
 ];
 
 export default function ProfilePage() {
@@ -43,6 +45,7 @@ export default function ProfilePage() {
       await submitProfile({
         ageGroup: values.ageGroup,
         gender: values.gender,
+        program: values.program,
         mbbsYear: values.mbbsYear,
         digitalToolUseFrequency: values.digitalToolUseFrequency,
         priorPharmacologyExposure: values.priorPharmacologyExposure === "yes",

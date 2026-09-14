@@ -105,12 +105,17 @@ model Consent {
   consentTimestamp DateTime    @default(now())
 }
 
+/// program: free text, e.g. "MBBS" | "BDS" | "B.Pharm" | "Pharm.D" | "B.Sc Nursing" | "Other"
+/// mbbsYear: kept as the DB column name for continuity, but holds the
+/// student's year of study in whichever program they selected (not
+/// MBBS-specific) — see src/lib/programs.ts for the current option list.
 model BaselineProfile {
   id                        String      @id @default(cuid())
   participantId             String      @unique
   participant               Participant @relation(fields: [participantId], references: [id])
   ageGroup                  String?
   gender                    String?
+  program                   String?
   mbbsYear                  String?
   priorPharmacologyExposure Boolean?
   priorPharmacologyExam     Boolean?

@@ -118,7 +118,7 @@ export default function ExpertProfilePage() {
             </div>
           </div>
           <div>
-            <Label className="mb-2 text-sm font-medium">Medical-education experience</Label>
+            <Label className="mb-2 text-sm font-medium">Health-professions education experience</Label>
             <Input
               className="rounded-xl"
               placeholder="e.g. Curriculum committee, 4 years"

@@ -185,6 +185,12 @@ export function InstrumentsClient({
                 </TableBody>
               </Table>
             </div>
+            <Reference
+              citations={[
+                "Brooke, J. (1996). SUS: A “quick and dirty” usability scale. In P. W. Jordan et al. (Eds.), Usability Evaluation in Industry. Taylor & Francis.",
+                "Sauro, J. (2011). A Practical Guide to the System Usability Scale. Measuring Usability LLC. (Published benchmark mean = 68)",
+              ]}
+            />
           </TabsContent>
 
           <TabsContent value="appquality">
@@ -211,6 +217,11 @@ export function InstrumentsClient({
                 </div>
               ))}
             </div>
+            <Reference
+              citations={[
+                "Stoyanov, S. R., Hides, L., Kavanagh, D. J., & Wilson, H. (2016). Development and validation of the User Version of the Mobile Application Rating Scale (uMARS). JMIR mHealth and uHealth, 4(2), e72.",
+              ]}
+            />
           </TabsContent>
 
           <TabsContent value="cvi">
@@ -262,10 +273,33 @@ export function InstrumentsClient({
                 </TableBody>
               </Table>
             </div>
+            <Reference
+              citations={[
+                "Lynn, M. R. (1986). Determination and quantification of content validity index. Nursing Research, 35(6), 382-386.",
+                "Polit, D. F., Beck, C. T., & Owen, S. V. (2007). Is the CVI an acceptable indicator of content validity? Research in Nursing & Health, 30(4), 459-467.",
+              ]}
+            />
           </TabsContent>
         </Tabs>
       </main>
     </AdminShell>
+  );
+}
+
+function Reference({ citations }: { citations: string[] }) {
+  return (
+    <div className="mt-5 rounded-2xl border border-dashed border-border p-4">
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        Reference{citations.length > 1 ? "s" : ""}
+      </p>
+      <ul className="flex flex-col gap-1.5">
+        {citations.map((c, i) => (
+          <li key={i} className="text-xs leading-relaxed text-muted-foreground">
+            {c}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

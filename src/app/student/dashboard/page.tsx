@@ -40,7 +40,7 @@ export default async function StudentDashboard() {
   const stages: StageCard[] = [
     {
       title: "Baseline Profile",
-      description: "Your MBBS year and prior pharmacology exposure.",
+      description: "Your program, year of study and prior pharmacology exposure.",
       icon: UserRound,
       status: state.profileDone ? "completed" : "active",
       meta: state.profileDone ? "Completed" : "Start here",

@@ -33,7 +33,7 @@ function inviteEmailDraft(link: string) {
   const subject = "Invitation: PHAMORA Expert Content Validation Panel";
   const body = `Dear Colleague,
 
-You are invited to join the expert panel validating the content of PHAMORA, an offline pharmacology learning app for undergraduate medical students, as part of a formal Content Validity Index (CVI) study.
+You are invited to join the expert panel validating the content of PHAMORA, an offline pharmacology learning app for undergraduate health-professions students (MBBS, BDS, Pharmacy/Pharm.D, and Nursing), as part of a formal Content Validity Index (CVI) study.
 
 Your task is to rate a set of lessons, MCQs and monographs (~10-30 minutes) for relevance to the undergraduate pharmacology curriculum. No installation or account is needed — everything happens through your personal review link below.
 
