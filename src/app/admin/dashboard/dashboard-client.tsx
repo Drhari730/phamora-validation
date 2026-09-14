@@ -12,7 +12,9 @@ import {
   TrendingUp,
   Search,
   Bell,
+  ClipboardList,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import {
   Bar,
   BarChart,
@@ -80,6 +82,66 @@ export function DashboardClient({
       </header>
 
       <main className="px-6 py-8 sm:px-8">
+        <div className="mb-8 rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="mb-5 flex items-center gap-2.5">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
+              <ClipboardList size={15} />
+            </div>
+            <div>
+              <h3 className="font-heading text-sm font-bold">Study Design &amp; Sample Size Targets</h3>
+              <p className="text-xs text-muted-foreground">
+                Mixed-methods validation study — three components, each with its own recruitment target
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-xl bg-muted p-4">
+              <p className="mb-1 text-xs font-semibold text-foreground">A. Content Validity</p>
+              <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">
+                Expert CVI panel rating relevance of lessons, MCQs and monographs
+              </p>
+              <div className="mb-1.5 flex items-baseline justify-between">
+                <span className="font-heading text-lg font-bold">{s.expertsInvited}</span>
+                <span className="text-xs text-muted-foreground">of 8 target experts</span>
+              </div>
+              <Progress value={Math.min(100, (s.expertsInvited / 8) * 100)} className="h-1.5" />
+            </div>
+
+            <div className="rounded-xl bg-muted p-4">
+              <p className="mb-1 text-xs font-semibold text-foreground">B. Usability &amp; Acceptability</p>
+              <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">
+                SUS + App Quality (uMARS), same cohort as Component C
+              </p>
+              <div className="mb-1.5 flex items-baseline justify-between">
+                <span className="font-heading text-lg font-bold">{s.studentsEnrolled}</span>
+                <span className="text-xs text-muted-foreground">of 40 target students</span>
+              </div>
+              <Progress value={Math.min(100, (s.studentsEnrolled / 40) * 100)} className="h-1.5" />
+            </div>
+
+            <div className="rounded-xl bg-muted p-4">
+              <p className="mb-1 text-xs font-semibold text-foreground">C. Educational Effectiveness</p>
+              <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">
+                Single-group pre/post knowledge test, same cohort
+              </p>
+              <div className="mb-1.5 flex items-baseline justify-between">
+                <span className="font-heading text-lg font-bold">{s.studentsEnrolled}</span>
+                <span className="text-xs text-muted-foreground">of 35 minimum (40 recommended)</span>
+              </div>
+              <Progress value={Math.min(100, (s.studentsEnrolled / 35) * 100)} className="h-1.5" />
+            </div>
+          </div>
+
+          <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+            Sample sizes: 6–10 experts is the standard, defensible CVI panel size (Lynn, 1986) — 8
+            recommended. 35 students is the minimum for the single-group pre/post design at a medium
+            effect size (d=0.5, α=0.05, 80% power); 40 is recommended to allow for attrition. A
+            two-group design (intervention vs. control) would need ~110 total (55/arm) for the same
+            effect size — not used here.
+          </p>
+        </div>
+
         <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           <StatCard label="Students Enrolled" value={s.studentsEnrolled} icon={Users} />
           <StatCard label="Consent Completed" value={s.consentCompleted} icon={FileCheck2} tone="accent" />

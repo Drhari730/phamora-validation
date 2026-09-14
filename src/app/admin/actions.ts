@@ -356,6 +356,7 @@ export async function updateStudySettings(input: {
   randomizeOptionOrder?: boolean;
   showSusScoreToStudent?: boolean;
   consentVersion?: string;
+  ethicsApprovalRef?: string;
 }) {
   await requireAdmin();
   await prisma.studySettings.update({

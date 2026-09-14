@@ -20,6 +20,7 @@ export default async function AdminSettingsPage() {
         randomizeOptionOrder: settings?.randomizeOptionOrder ?? true,
         showSusScoreToStudent: settings?.showSusScoreToStudent ?? false,
         consentVersion: settings?.consentVersion ?? "v1.0",
+        ethicsApprovalRef: settings?.ethicsApprovalRef ?? "",
       }}
     />
   );

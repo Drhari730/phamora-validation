@@ -53,6 +53,7 @@ interface SettingsData {
   randomizeOptionOrder: boolean;
   showSusScoreToStudent: boolean;
   consentVersion: string;
+  ethicsApprovalRef: string;
 }
 
 export function SettingsClient({ initial }: { initial: SettingsData }) {
@@ -173,6 +174,19 @@ export function SettingsClient({ initial }: { initial: SettingsData }) {
               onChange={(e) => set("consentVersion", e.target.value)}
               className="w-32 rounded-xl"
             />
+          </div>
+          <div>
+            <Label className="mb-2 text-sm font-medium">Ethics approval reference</Label>
+            <Input
+              value={form.ethicsApprovalRef}
+              onChange={(e) => set("ethicsApprovalRef", e.target.value)}
+              placeholder="e.g. MSRUAS-IEC/2026/042"
+              className="rounded-xl"
+            />
+            <p className="mt-2 text-xs text-muted-foreground">
+              Shown on the student consent page. Leave blank to show a generic
+              "approval obtained" statement without a specific reference number.
+            </p>
           </div>
         </SettingsCard>
       </main>

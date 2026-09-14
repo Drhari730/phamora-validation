@@ -52,6 +52,7 @@ model StudySettings {
   id                     String    @id @default("singleton")
   consentVersion         String    @default("v1.0")
   consentBody            String    @default("")
+  ethicsApprovalRef      String?
   studyPeriodStart       DateTime?
   studyPeriodEnd         DateTime?
   studyInstructions      String?
@@ -80,6 +81,7 @@ model Participant {
   id              String   @id @default(cuid())
   participantCode String   @unique
   pinHash         String
+  email           String? // optional — collected at consent for a welcome/reminder email only, never shown alongside survey data
   studyGroup      String? // e.g. "intervention" | "control", if a two-arm design is used
   academicYear    String? // MBBS year / semester, free-form per admin config
   isPilot         Boolean  @default(false)

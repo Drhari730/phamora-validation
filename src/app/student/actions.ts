@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { hashSecret, generatePin } from "@/lib/auth";
 import { createSession, requireSession } from "@/lib/session";
@@ -28,9 +29,74 @@ async function currentParticipant() {
   return prisma.participant.findUnique({ where: { id: session.id } });
 }
 
+function studentWelcomeEmailBody(input: {
+  participantCode: string;
+  ethicsRef: string | null;
+  dashboardUrl: string;
+}) {
+  const ethicsLine = input.ethicsRef
+    ? `Ethics approval has been obtained from the Institutional Ethics Committee (reference: ${input.ethicsRef}).`
+    : `Ethics approval has been obtained from the Institutional Ethics Committee.`;
+
+  return `Welcome to the PHAMORA Validation Study!
+
+Thank you for agreeing to take part. Your participation is voluntary, ungraded, and identified only by an anonymous participant code — never your name.
+
+About the study:
+This study evaluates the usability, educational effectiveness and content validity of PHAMORA, an offline pharmacology learning app, for undergraduate health-professions students. It involves a short baseline profile, a pre-test, a defined period of free app use, and then a post-test with a few brief questionnaires.
+
+${ethicsLine}
+
+Your participant ID (for your own records): ${input.participantCode}
+
+Continue your journey any time here:
+${input.dashboardUrl}
+
+If you have any questions, you're welcome to reply to this email.
+
+Thank you for contributing to this research.
+
+Dr. G. Hari Prakash
+Principal Investigator, PHAMORA Validation Study`;
+}
+
+async function sendStudentWelcomeEmail(email: string, participantCode: string) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM_EMAIL;
+  if (!apiKey || !from) return; // non-blocking: registration still succeeds without email configured
+
+  try {
+    const settings = await prisma.studySettings.findUnique({ where: { id: "singleton" } });
+    const h = await headers();
+    const host = h.get("host") ?? "localhost:3000";
+    const protocol = host.startsWith("localhost") ? "http" : "https";
+
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: `PHAMORA Validation Study <${from}>`,
+        to: [email],
+        subject: "Welcome to the PHAMORA Validation Study",
+        text: studentWelcomeEmailBody({
+          participantCode,
+          ethicsRef: settings?.ethicsApprovalRef ?? null,
+          dashboardUrl: `${protocol}://${host}/student/dashboard`,
+        }),
+      }),
+    });
+  } catch {
+    // Never let an email failure block the student's registration.
+  }
+}
+
 export async function submitConsent(input: {
   informationRead: boolean;
   voluntaryAgree: boolean;
+  email?: string;
 }) {
   if (!input.informationRead || !input.voluntaryAgree) {
     return { ok: false, error: "Both consent statements must be checked." };
@@ -48,8 +114,13 @@ export async function submitConsent(input: {
   });
   await prisma.participant.update({
     where: { id: participant.id },
-    data: { studyStatus: "CONSENTED" },
+    data: { studyStatus: "CONSENTED", email: input.email || undefined },
   });
+
+  if (input.email) {
+    await sendStudentWelcomeEmail(input.email, participant.participantCode);
+  }
+
   revalidatePath("/student");
   return { ok: true, participantCode: participant.participantCode };
 }
