@@ -11,6 +11,7 @@ import {
   cviStatus,
   mean,
 } from "@/lib/scoring";
+import { expertInviteEmailHtml } from "@/lib/email-templates";
 
 export async function adminLogin(email: string, password: string) {
   const user = await prisma.user.findUnique({ where: { email } });
@@ -291,6 +292,7 @@ export async function sendExpertInviteEmail(expertId: string, origin: string) {
       to: [expert.email],
       subject: "Invitation: PHAMORA Expert Content Validation Panel",
       text: expertInviteEmailBody(link),
+      html: expertInviteEmailHtml(link),
     }),
   });
 

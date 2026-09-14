@@ -7,6 +7,7 @@ import { hashSecret, generatePin } from "@/lib/auth";
 import { createSession, requireSession } from "@/lib/session";
 import { nextParticipantCode } from "@/lib/ids";
 import { percentageScore, scoreSus } from "@/lib/scoring";
+import { studentWelcomeEmailHtml } from "@/lib/email-templates";
 
 async function getOrCreateParticipant() {
   const session = await requireSession("STUDENT");
@@ -82,6 +83,11 @@ async function sendStudentWelcomeEmail(email: string, participantCode: string) {
         to: [email],
         subject: "Welcome to the PHAMORA Validation Study",
         text: studentWelcomeEmailBody({
+          participantCode,
+          ethicsRef: settings?.ethicsApprovalRef ?? null,
+          dashboardUrl: `${protocol}://${host}/student/dashboard`,
+        }),
+        html: studentWelcomeEmailHtml({
           participantCode,
           ethicsRef: settings?.ethicsApprovalRef ?? null,
           dashboardUrl: `${protocol}://${host}/student/dashboard`,
