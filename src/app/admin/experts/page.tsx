@@ -10,5 +10,7 @@ export default async function AdminExpertsPage() {
   const host = h.get("host") ?? "localhost:3000";
   const protocol = host.startsWith("localhost") ? "http" : "https";
 
-  return <ExpertsClient rows={rows} origin={`${protocol}://${host}`} />;
+  const emailConfigured = Boolean(process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL);
+
+  return <ExpertsClient rows={rows} origin={`${protocol}://${host}`} emailConfigured={emailConfigured} />;
 }

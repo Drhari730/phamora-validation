@@ -177,6 +177,7 @@ export async function getExpertsTable() {
   const totalItems = await prisma.contentItem.count();
 
   return experts.map((e) => ({
+    id: e.id,
     code: e.expertCode,
     email: e.email,
     discipline: e.speciality ?? "—",
@@ -244,7 +245,62 @@ export async function inviteExpert(input: {
     },
   });
   revalidatePath("/admin/experts");
-  return { ok: true, expertCode: expert.expertCode, inviteToken: expert.inviteToken };
+  return { ok: true, id: expert.id, expertCode: expert.expertCode, inviteToken: expert.inviteToken };
+}
+
+function expertInviteEmailBody(link: string) {
+  return `Dear Colleague,
+
+You are invited to join the expert panel validating the content of PHAMORA, an offline pharmacology learning app for undergraduate health-professions students (MBBS, BDS, Pharmacy/Pharm.D, and Nursing), as part of a formal Content Validity Index (CVI) study.
+
+Your task is to rate a set of lessons, MCQs and monographs (~10-30 minutes) for relevance to the undergraduate pharmacology curriculum. No installation or account is needed — everything happens through your personal review link below.
+
+Your personal review link:
+${link}
+
+This link is unique to you — please do not share it. If you have any questions, feel free to reply to this email.
+
+Thank you for contributing your expertise to this study.
+
+Best regards,
+Dr. G. Hari Prakash
+Principal Investigator, PHAMORA Validation Study`;
+}
+
+export async function sendExpertInviteEmail(expertId: string, origin: string) {
+  await requireAdmin();
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM_EMAIL;
+  if (!apiKey || !from) {
+    return { ok: false, error: "Email sending isn't configured on this deployment yet." };
+  }
+
+  const expert = await prisma.expert.findUnique({ where: { id: expertId } });
+  if (!expert) return { ok: false, error: "Expert not found." };
+  if (!expert.email) return { ok: false, error: "This expert has no email on file." };
+
+  const link = `${origin}/expert/invite/${expert.inviteToken}`;
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: `PHAMORA Validation Study <${from}>`,
+      to: [expert.email],
+      subject: "Invitation: PHAMORA Expert Content Validation Panel",
+      text: expertInviteEmailBody(link),
+    }),
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    return { ok: false, error: `Resend API error (${res.status}): ${detail.slice(0, 200)}` };
+  }
+
+  revalidatePath("/admin/experts");
+  return { ok: true };
 }
 
 // --- Question bank (Instruments) --------------------------------------------
