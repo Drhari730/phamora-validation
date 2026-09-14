@@ -148,11 +148,17 @@ export async function getStudentsTable() {
   return participants.map((p) => {
     const pretest = p.assessmentSessions.find((s) => s.assessmentType === "PRETEST");
     const posttest = p.assessmentSessions.find((s) => s.assessmentType === "POSTTEST");
+    const pretestScore = pretest?.completedAt ? Math.round(pretest.percentage ?? 0) : null;
+    const posttestScore = posttest?.completedAt ? Math.round(posttest.percentage ?? 0) : null;
     return {
       code: p.participantCode,
       consent: Boolean(p.consent),
       pretest: Boolean(pretest?.completedAt),
       posttest: Boolean(posttest?.completedAt),
+      pretestScore,
+      posttestScore,
+      improvement:
+        pretestScore !== null && posttestScore !== null ? posttestScore - pretestScore : null,
       sus: p.susResponse ? Math.round(p.susResponse.susScore) : null,
       appQuality: p.appQualityResponses.length > 0,
       feedback: Boolean(p.feedback),

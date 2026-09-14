@@ -239,6 +239,7 @@ export function DashboardClient({
                   <TableHead>Consent</TableHead>
                   <TableHead>Pre-Test</TableHead>
                   <TableHead>Post-Test</TableHead>
+                  <TableHead>Improvement</TableHead>
                   <TableHead>SUS</TableHead>
                   <TableHead>App Quality</TableHead>
                   <TableHead>Feedback</TableHead>
@@ -248,7 +249,7 @@ export function DashboardClient({
               <TableBody>
                 {recentStudents.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="py-10 text-center text-sm text-muted-foreground">
+                    <TableCell colSpan={9} className="py-10 text-center text-sm text-muted-foreground">
                       No participants enrolled yet.
                     </TableCell>
                   </TableRow>
@@ -257,8 +258,22 @@ export function DashboardClient({
                   <TableRow key={row.code}>
                     <TableCell className="font-mono text-xs font-medium">{row.code}</TableCell>
                     <TableCell><DotCell checked={row.consent} /></TableCell>
-                    <TableCell><DotCell checked={row.pretest} /></TableCell>
-                    <TableCell><DotCell checked={row.posttest} /></TableCell>
+                    <TableCell className="text-sm">
+                      {row.pretestScore !== null ? `${row.pretestScore}%` : "—"}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {row.posttestScore !== null ? `${row.posttestScore}%` : "—"}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {row.improvement !== null ? (
+                        <span className={row.improvement >= 0 ? "text-success" : "text-destructive"}>
+                          {row.improvement >= 0 ? "+" : ""}
+                          {row.improvement}%
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </TableCell>
                     <TableCell className="text-sm">{row.sus ?? "—"}</TableCell>
                     <TableCell><DotCell checked={row.appQuality} /></TableCell>
                     <TableCell><DotCell checked={row.feedback} /></TableCell>

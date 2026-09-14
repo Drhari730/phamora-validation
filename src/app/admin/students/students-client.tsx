@@ -84,6 +84,7 @@ export function StudentsClient({ rows }: { rows: Row[] }) {
                   <TableHead>Consent</TableHead>
                   <TableHead>Pre-Test</TableHead>
                   <TableHead>Post-Test</TableHead>
+                  <TableHead>Improvement</TableHead>
                   <TableHead>SUS</TableHead>
                   <TableHead>App Quality</TableHead>
                   <TableHead>Feedback</TableHead>
@@ -104,8 +105,22 @@ export function StudentsClient({ rows }: { rows: Row[] }) {
                       )}
                     </TableCell>
                     <TableCell><DotCell checked={row.consent} /></TableCell>
-                    <TableCell><DotCell checked={row.pretest} /></TableCell>
-                    <TableCell><DotCell checked={row.posttest} /></TableCell>
+                    <TableCell className="text-sm">
+                      {row.pretestScore !== null ? `${row.pretestScore}%` : "—"}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {row.posttestScore !== null ? `${row.posttestScore}%` : "—"}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {row.improvement !== null ? (
+                        <span className={row.improvement >= 0 ? "text-success" : "text-destructive"}>
+                          {row.improvement >= 0 ? "+" : ""}
+                          {row.improvement}%
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </TableCell>
                     <TableCell className="text-sm">{row.sus ?? "—"}</TableCell>
                     <TableCell><DotCell checked={row.appQuality} /></TableCell>
                     <TableCell><DotCell checked={row.feedback} /></TableCell>
@@ -120,7 +135,7 @@ export function StudentsClient({ rows }: { rows: Row[] }) {
                 ))}
                 {filtered.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={10} className="py-10 text-center text-sm text-muted-foreground">
+                    <TableCell colSpan={11} className="py-10 text-center text-sm text-muted-foreground">
                       No participants match this search.
                     </TableCell>
                   </TableRow>
