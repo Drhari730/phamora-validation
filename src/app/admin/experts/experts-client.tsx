@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Mail, Microscope, Copy, Check, Send, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Mail, Microscope, Copy, Check, Send, Loader2, Pencil, Trash2, MessageCircle } from "lucide-react";
 import { AdminShell } from "@/components/pharma/admin-shell";
 import { StatCard } from "@/components/pharma/stat-card";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +48,22 @@ Best regards,
 Dr. G. Hari Prakash
 Principal Investigator, PHAMORA Validation Study`;
   return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function whatsappInviteUrl(link: string, name?: string | null) {
+  const text = `Hello ${name ?? "Sir/Madam"},
+
+I am Dr. G. Hari Prakash. I would be grateful for your expert review of PHAMORA, an offline pharmacology learning app for undergraduate students (MBBS, BDS, Pharmacy/Pharm.D, Nursing), as part of a Content Validity Index (CVI) study.
+
+It takes about 10-30 minutes: you rate each lesson/MCQ/monograph for relevance. No account or password is needed, and your ratings autosave, so you can pause and resume.
+
+Your personal review link (please don't share it):
+${link}
+
+Thank you for your time and expertise.
+Dr. G. Hari Prakash
+PHAMORA Validation Study`;
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 
 export function ExpertsClient({
@@ -106,6 +122,16 @@ export function ExpertsClient({
             Couldn't send — {sendError}
           </div>
         )}
+        <div className="mb-6 rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <p className="mb-3 text-sm font-semibold">How to add and invite a reviewer</p>
+          <ol className="grid gap-3 text-xs text-muted-foreground sm:grid-cols-4">
+            <li><strong className="text-foreground">1. Invite Expert</strong> (top right): enter their name, email and speciality, then Generate Invite Link.</li>
+            <li><strong className="text-foreground">2. Send it</strong>: use Send (email from the portal), WhatsApp (opens a ready message), Draft (your own mail app) or Copy.</li>
+            <li><strong className="text-foreground">3. Track progress</strong>: the Completion bar fills as they rate items. Their ratings autosave.</li>
+            <li><strong className="text-foreground">4. Fix or remove</strong>: the pencil edits name or email; Delete removes the invitation and its link.</li>
+          </ol>
+        </div>
+
         <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <StatCard label="Experts Invited" value={rows.length} icon={Microscope} />
           <StatCard label="Panels Submitted" value={`${submitted}/${rows.length}`} icon={Microscope} tone="accent" />
@@ -181,6 +207,14 @@ export function ExpertsClient({
                             className="flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
                           >
                             <Mail size={13} /> Draft
+                          </a>
+                          <a
+                            href={whatsappInviteUrl(link, e.name)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 text-xs font-medium text-success hover:underline"
+                          >
+                            <MessageCircle size={13} /> WhatsApp
                           </a>
                           {emailConfigured && e.email && (
                             <button

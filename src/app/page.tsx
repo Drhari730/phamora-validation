@@ -42,6 +42,61 @@ const accessCards = [
   },
 ];
 
+const guides = [
+  {
+    title: "Expert reviewers",
+    time: "About 10–30 minutes · no account or password",
+    icon: Microscope,
+    accent: "from-accent to-accent/70",
+    steps: [
+      {
+        title: "Open your personal link",
+        body: "The investigator sends it by email or WhatsApp. Tapping it signs you in directly. The link is unique to you, so please don't share it.",
+      },
+      {
+        title: "Fill in your short profile",
+        body: "Designation, speciality and years of experience, about one minute. This is used only to describe the expert panel.",
+      },
+      {
+        title: "Rate each item for relevance",
+        body: "Review each lesson, MCQ and monograph and rate it 1 to 4: Not Relevant, Needs Major Revision, Relevant with Minor Revision, or Highly Relevant. Add a comment if you suggest a change.",
+      },
+      {
+        title: "Pause and resume any time",
+        body: "Every rating autosaves. If you stop midway, open the same link again and continue where you left off.",
+      },
+      {
+        title: "Optional: try the app first",
+        body: "If you'd like to see PHAMORA before rating, install the Android app from the download section below. It works on Android phones only.",
+      },
+    ],
+  },
+  {
+    title: "Students",
+    time: "Around 4 stages · anonymous, ungraded",
+    icon: GraduationCap,
+    accent: "from-primary to-primary/70",
+    steps: [
+      {
+        title: "Install the PHAMORA app",
+        body: "Android phones only. Download it from the section below and follow the install instructions.",
+      },
+      {
+        title: "Consent and baseline profile",
+        body: "Tap Begin as Student, agree to the consent, enter your email for a welcome message, then answer a few background questions. You are identified only by an anonymous code.",
+      },
+      {
+        title: "Pre-test, then use the app",
+        body: "Take the short knowledge test, then use PHAMORA freely for the study period.",
+      },
+      {
+        title: "Post-test and questionnaires",
+        body: "Retake the knowledge test, then complete the usability scale (SUS), the app-quality survey and brief feedback.",
+      },
+    ],
+  },
+];
+
 const stats = [
   { label: "Validation components", value: "3", icon: ClipboardCheck },
   { label: "Pharmacology modules", value: "4", icon: Pill },
@@ -127,6 +182,39 @@ export default function Home() {
               </div>
             </Link>
           ))}
+        </section>
+
+        <section className="pb-20">
+          <div className="mb-8 text-center">
+            <h2 className="font-heading text-2xl font-bold sm:text-3xl">How it works</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Quick step-by-step guides for each role</p>
+          </div>
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            {guides.map((g) => (
+              <div key={g.title} className="rounded-3xl border border-border bg-card p-7 shadow-sm">
+                <div className="mb-1 flex items-center gap-3">
+                  <div className={`grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br ${g.accent} text-primary-foreground`}>
+                    <g.icon size={18} />
+                  </div>
+                  <h3 className="font-heading text-lg font-bold">{g.title}</h3>
+                </div>
+                <p className="mb-5 ml-[3.25rem] text-xs text-muted-foreground">{g.time}</p>
+                <ol className="flex flex-col gap-4">
+                  {g.steps.map((s, i) => (
+                    <li key={s.title} className="flex gap-3">
+                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                        {i + 1}
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold">{s.title}</p>
+                        <p className="text-xs leading-relaxed text-muted-foreground">{s.body}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="pb-24">
