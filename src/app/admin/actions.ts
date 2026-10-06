@@ -269,6 +269,16 @@ export async function updateExpertContact(input: { id: string; name: string; ema
   return { ok: true };
 }
 
+export async function deleteExpert(id: string) {
+  await requireAdmin();
+  await prisma.$transaction([
+    prisma.expertCviRating.deleteMany({ where: { expertId: id } }),
+    prisma.expert.delete({ where: { id } }),
+  ]);
+  revalidatePath("/admin/experts");
+  return { ok: true };
+}
+
 function expertInviteEmailBody(link: string) {
   return `Dear Colleague,
 

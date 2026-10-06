@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Mail, Microscope, Copy, Check, Send, Loader2, Pencil } from "lucide-react";
+import { Mail, Microscope, Copy, Check, Send, Loader2, Pencil, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/pharma/admin-shell";
 import { StatCard } from "@/components/pharma/stat-card";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { inviteExpert, sendExpertInviteEmail, updateExpertContact } from "../actions";
+import { inviteExpert, sendExpertInviteEmail, updateExpertContact, deleteExpert } from "../actions";
 import type { getExpertsTable } from "../actions";
 
 type Row = Awaited<ReturnType<typeof getExpertsTable>>[number];
@@ -198,6 +198,7 @@ export function ExpertsClient({
                               {sendingCode === e.code ? "Sending" : sentCode === e.code ? "Sent" : "Send"}
                             </button>
                           )}
+                          <DeleteExpertDialog row={e} />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -216,6 +217,58 @@ export function ExpertsClient({
         </div>
       </main>
     </AdminShell>
+  );
+}
+
+function DeleteExpertDialog({ row }: { row: Row }) {
+  const [open, setOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
+
+  function confirmDelete() {
+    startTransition(async () => {
+      const res = await deleteExpert(row.id);
+      if (res.ok) setOpen(false);
+    });
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger
+        render={
+          <button
+            aria-label={`Delete invitation ${row.code}`}
+            className="flex items-center gap-1.5 text-xs font-medium text-destructive hover:underline"
+          />
+        }
+      >
+        <Trash2 size={13} /> Delete
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete invitation {row.code}?</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4 px-4 pb-4">
+          <p className="text-sm text-muted-foreground">
+            This permanently removes {row.name ?? row.email ?? row.code} and their invite link — the link will stop
+            working immediately.
+            {row.completed > 0 && (
+              <strong className="mt-2 block text-destructive">
+                They have already rated {row.completed} item{row.completed === 1 ? "" : "s"}; those ratings will be
+                deleted from the CVI data too.
+              </strong>
+            )}
+          </p>
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1 rounded-full" onClick={() => setOpen(false)} disabled={pending}>
+              Cancel
+            </Button>
+            <Button variant="destructive" className="flex-1 rounded-full" onClick={confirmDelete} disabled={pending}>
+              {pending ? "Deleting…" : "Delete"}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
