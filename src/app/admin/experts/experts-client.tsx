@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Mail, Microscope, Copy, Check, Send, Loader2, Pencil, Trash2, MessageCircle } from "lucide-react";
+import { Mail, Microscope, Copy, Check, Send, Loader2, Pencil, Trash2, MessageCircle, KeyRound } from "lucide-react";
 import { AdminShell } from "@/components/pharma/admin-shell";
 import { StatCard } from "@/components/pharma/stat-card";
 import { Badge } from "@/components/ui/badge";
@@ -190,7 +190,8 @@ export function ExpertsClient({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-3">
+                        <div className="flex min-w-[15rem] flex-wrap items-center gap-x-3 gap-y-1.5">
+                          <KeyDialog row={e} link={link} />
                           <button
                             onClick={() => copyLink(e.inviteToken, e.code)}
                             className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
@@ -251,6 +252,67 @@ export function ExpertsClient({
         </div>
       </main>
     </AdminShell>
+  );
+}
+
+function CopyField({ label, value }: { label: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div>
+      <p className="mb-1 text-xs font-medium text-muted-foreground">{label}</p>
+      <div className="flex items-start gap-2">
+        <code className="min-w-0 flex-1 break-all rounded-lg bg-secondary p-2 text-xs">{value}</code>
+        <Button
+          variant="outline"
+          size="sm"
+          className="shrink-0 gap-1.5 rounded-full"
+          onClick={() => {
+            navigator.clipboard.writeText(value);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          }}
+        >
+          {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "Copied" : "Copy"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function KeyDialog({ row, link }: { row: Row; link: string }) {
+  return (
+    <Dialog>
+      <DialogTrigger
+        render={
+          <button
+            aria-label={`Show key for ${row.code}`}
+            className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+          />
+        }
+      >
+        <KeyRound size={13} /> Key
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {row.code}
+            {row.name ? ` · ${row.name}` : ""}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4 px-4 pb-4">
+          <CopyField label="Personal review link (opens and signs in directly)" value={link} />
+          <CopyField label="Invite key (they can paste this on the Expert Portal page instead)" value={row.inviteToken} />
+          <a
+            href={whatsappInviteUrl(link, row.name)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            <MessageCircle size={14} /> Share on WhatsApp
+          </a>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
