@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Mail, Microscope, Copy, Check, Plus, Send, Loader2 } from "lucide-react";
+import { Mail, Microscope, Copy, Check, Send, Loader2, Pencil } from "lucide-react";
 import { AdminShell } from "@/components/pharma/admin-shell";
 import { StatCard } from "@/components/pharma/stat-card";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { inviteExpert, sendExpertInviteEmail } from "../actions";
+import { inviteExpert, sendExpertInviteEmail, updateExpertContact } from "../actions";
 import type { getExpertsTable } from "../actions";
 
 type Row = Awaited<ReturnType<typeof getExpertsTable>>[number];
@@ -123,6 +123,9 @@ export function ExpertsClient({
               <TableHeader>
                 <TableRow>
                   <TableHead>Expert ID</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Invited</TableHead>
                   <TableHead>Discipline</TableHead>
                   <TableHead>Items Assigned</TableHead>
                   <TableHead>Items Completed</TableHead>
@@ -137,6 +140,20 @@ export function ExpertsClient({
                   return (
                     <TableRow key={e.code}>
                       <TableCell className="font-mono text-xs font-medium">{e.code}</TableCell>
+                      <TableCell className="text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className={e.name ? "font-medium" : "text-muted-foreground"}>{e.name ?? "—"}</span>
+                          <EditContactDialog row={e} />
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {e.email ? (
+                          <span className="break-all">{e.email}</span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-xs text-muted-foreground">{e.invited}</TableCell>
                       <TableCell className="text-sm">{e.discipline}</TableCell>
                       <TableCell className="text-sm">{e.assigned}</TableCell>
                       <TableCell className="text-sm">{e.completed}</TableCell>
@@ -188,7 +205,7 @@ export function ExpertsClient({
                 })}
                 {rows.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="py-10 text-center text-sm text-muted-foreground">
+                    <TableCell colSpan={9} className="py-10 text-center text-sm text-muted-foreground">
                       No experts invited yet.
                     </TableCell>
                   </TableRow>
@@ -202,12 +219,69 @@ export function ExpertsClient({
   );
 }
 
+function EditContactDialog({ row }: { row: Row }) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState(row.name ?? "");
+  const [email, setEmail] = useState(row.email ?? "");
+  const [pending, startTransition] = useTransition();
+
+  function save() {
+    startTransition(async () => {
+      const res = await updateExpertContact({ id: row.id, name, email });
+      if (res.ok) setOpen(false);
+    });
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
+        if (o) {
+          setName(row.name ?? "");
+          setEmail(row.email ?? "");
+        }
+      }}
+    >
+      <DialogTrigger
+        render={
+          <button
+            aria-label={`Edit contact for ${row.code}`}
+            className="text-muted-foreground transition-colors hover:text-primary"
+          />
+        }
+      >
+        <Pencil size={12} />
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit contact — {row.code}</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4 px-4 pb-4">
+          <div>
+            <Label className="mb-2 text-sm font-medium">Name</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl" placeholder="e.g. Dr. A. Kumar" />
+          </div>
+          <div>
+            <Label className="mb-2 text-sm font-medium">Email</Label>
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl" placeholder="expert@institution.edu" />
+          </div>
+          <Button className="rounded-full" disabled={pending} onClick={save}>
+            {pending ? "Saving…" : "Save"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function InviteDialog({ origin, emailConfigured }: { origin: string; emailConfigured: boolean }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [sendErr, setSendErr] = useState<string | null>(null);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [speciality, setSpeciality] = useState("");
   const [designation, setDesignation] = useState("");
@@ -217,13 +291,14 @@ function InviteDialog({ origin, emailConfigured }: { origin: string; emailConfig
 
   function handleInvite() {
     startTransition(async () => {
-      const res = await inviteExpert({ email, speciality, designation, department });
+      const res = await inviteExpert({ name, email, speciality, designation, department });
       if (res.ok) setResult(res);
     });
   }
 
   function reset() {
     setResult(null);
+    setName("");
     setEmail("");
     setSpeciality("");
     setDesignation("");
@@ -266,6 +341,10 @@ function InviteDialog({ origin, emailConfigured }: { origin: string; emailConfig
         <div className="flex flex-col gap-4 px-4 pb-4">
           {!result ? (
             <>
+              <div>
+                <Label className="mb-2 text-sm font-medium">Name</Label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl" placeholder="e.g. Dr. A. Kumar" />
+              </div>
               <div>
                 <Label className="mb-2 text-sm font-medium">
                   Email <span className="font-normal text-muted-foreground">(optional, for a ready-to-send invite)</span>

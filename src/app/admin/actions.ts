@@ -186,7 +186,9 @@ export async function getExpertsTable() {
   return experts.map((e) => ({
     id: e.id,
     code: e.expertCode,
+    name: e.name,
     email: e.email,
+    invited: e.invitedAt.toISOString().slice(0, 10),
     discipline: e.speciality ?? "—",
     assigned: totalItems,
     completed: e.ratings.length,
@@ -232,6 +234,7 @@ export async function getCviData() {
 }
 
 export async function inviteExpert(input: {
+  name?: string;
   email?: string;
   speciality?: string;
   designation?: string;
@@ -245,7 +248,8 @@ export async function inviteExpert(input: {
     data: {
       expertCode: code,
       inviteToken: generateInviteToken(),
-      email: input.email,
+      name: input.name?.trim() || undefined,
+      email: input.email?.trim() || undefined,
       speciality: input.speciality,
       designation: input.designation,
       department: input.department,
@@ -253,6 +257,16 @@ export async function inviteExpert(input: {
   });
   revalidatePath("/admin/experts");
   return { ok: true, id: expert.id, expertCode: expert.expertCode, inviteToken: expert.inviteToken };
+}
+
+export async function updateExpertContact(input: { id: string; name: string; email: string }) {
+  await requireAdmin();
+  await prisma.expert.update({
+    where: { id: input.id },
+    data: { name: input.name.trim() || null, email: input.email.trim() || null },
+  });
+  revalidatePath("/admin/experts");
+  return { ok: true };
 }
 
 function expertInviteEmailBody(link: string) {

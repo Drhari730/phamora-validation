@@ -252,6 +252,7 @@ model Expert {
   id                        String    @id @default(cuid())
   expertCode                String    @unique // e.g. PHA-EXP-01
   inviteToken               String    @unique
+  name                      String?
   email                     String?
   designation               String?
   department                String?
