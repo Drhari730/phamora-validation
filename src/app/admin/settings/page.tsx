@@ -16,6 +16,8 @@ export default async function AdminSettingsPage() {
         postTestOpen: settings?.postTestOpen ?? false,
         usabilityOpen: settings?.usabilityOpen ?? false,
         expertReviewOpen: settings?.expertReviewOpen ?? true,
+        expertSelfRegistration: settings?.expertSelfRegistration ?? false,
+        expertRegistrationCode: settings?.expertRegistrationCode ?? "",
         randomizeQuestionOrder: settings?.randomizeQuestionOrder ?? true,
         randomizeOptionOrder: settings?.randomizeOptionOrder ?? true,
         showSusScoreToStudent: settings?.showSusScoreToStudent ?? false,

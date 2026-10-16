@@ -66,14 +66,95 @@ PHAMORA Validation Study`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 
+function RegistrationLinkCard({
+  origin,
+  open,
+  code,
+}: {
+  origin: string;
+  open: boolean;
+  code: string | null;
+}) {
+  const link = `${origin}/expert`;
+  const [copied, setCopied] = useState(false);
+  const message = `Hello,
+
+I am Dr. G. Hari Prakash. I would be grateful if you could join the expert panel validating PHAMORA, a pharmacology learning app for MBBS, BDS, Pharmacy/Pharm.D and Nursing students (Content Validity Index study).
+
+Open this link, enter your name and email${code ? ` and the access code ${code}` : ""}, and start rating (about 10-30 minutes; your ratings autosave):
+${link}
+
+Feel free to forward this to colleagues who teach pharmacology. Thank you!`;
+
+  return (
+    <div className="mb-6 rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold">Open registration link (one link for everyone)</p>
+        <Badge
+          variant="outline"
+          className={`rounded-full text-xs ${open ? "border-success/40 text-success" : "text-muted-foreground"}`}
+        >
+          {open ? "On" : "Off"}
+        </Badge>
+      </div>
+      {open ? (
+        <>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Share this single link. Experts enter their own name and email{code ? " plus the access code" : ""}, and
+            they appear in the table below automatically.
+            {code && (
+              <>
+                {" "}
+                Access code: <strong className="font-mono text-foreground">{code}</strong>
+              </>
+            )}
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <code className="min-w-0 flex-1 break-all rounded-lg bg-secondary p-2 text-xs">{link}</code>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-full"
+              onClick={() => {
+                navigator.clipboard.writeText(link);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
+              }}
+            >
+              {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "Copied" : "Copy link"}
+            </Button>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(message)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
+            >
+              <MessageCircle size={13} /> Share on WhatsApp
+            </a>
+          </div>
+        </>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Turned off. Turn on <strong className="text-foreground">Settings → Expert Self-Registration</strong> so
+          experts can register themselves from one shared link, instead of you adding each one.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function ExpertsClient({
   rows,
   origin,
   emailConfigured,
+  registrationOpen,
+  registrationCode,
 }: {
   rows: Row[];
   origin: string;
   emailConfigured: boolean;
+  registrationOpen: boolean;
+  registrationCode: string | null;
 }) {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [sentCode, setSentCode] = useState<string | null>(null);
@@ -122,6 +203,8 @@ export function ExpertsClient({
             Couldn't send — {sendError}
           </div>
         )}
+        <RegistrationLinkCard origin={origin} open={registrationOpen} code={registrationCode} />
+
         <div className="mb-6 rounded-2xl border border-border bg-card p-5 shadow-sm">
           <p className="mb-3 text-sm font-semibold">How to add and invite a reviewer</p>
           <ol className="grid gap-3 text-xs text-muted-foreground sm:grid-cols-4">

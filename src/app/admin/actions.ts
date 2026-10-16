@@ -384,6 +384,8 @@ export async function updateStudySettings(input: {
   postTestOpen?: boolean;
   usabilityOpen?: boolean;
   expertReviewOpen?: boolean;
+  expertSelfRegistration?: boolean;
+  expertRegistrationCode?: string;
   randomizeQuestionOrder?: boolean;
   randomizeOptionOrder?: boolean;
   showSusScoreToStudent?: boolean;

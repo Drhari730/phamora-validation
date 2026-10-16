@@ -63,6 +63,8 @@ model StudySettings {
   usabilityOpen          Boolean   @default(false)
   showSusScoreToStudent  Boolean   @default(false)
   expertReviewOpen       Boolean   @default(true)
+  expertSelfRegistration Boolean   @default(false)
+  expertRegistrationCode String?
   updatedAt              DateTime  @updatedAt
 }
 

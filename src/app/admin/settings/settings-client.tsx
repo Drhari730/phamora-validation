@@ -49,6 +49,8 @@ interface SettingsData {
   postTestOpen: boolean;
   usabilityOpen: boolean;
   expertReviewOpen: boolean;
+  expertSelfRegistration: boolean;
+  expertRegistrationCode: string;
   randomizeQuestionOrder: boolean;
   randomizeOptionOrder: boolean;
   showSusScoreToStudent: boolean;
@@ -143,6 +145,30 @@ export function SettingsClient({ initial }: { initial: SettingsData }) {
             checked={form.expertReviewOpen}
             onCheckedChange={(v) => set("expertReviewOpen", v)}
           />
+        </SettingsCard>
+
+        <SettingsCard title="Expert Self-Registration">
+          <ToggleRow
+            label="Let experts register themselves"
+            description="Anyone with the /expert link can enter their name and email and start reviewing. No invite needed."
+            checked={form.expertSelfRegistration}
+            onCheckedChange={(v) => set("expertSelfRegistration", v)}
+          />
+          <div>
+            <Label className="mb-2 text-sm font-medium">
+              Access code <span className="font-normal text-muted-foreground">(optional)</span>
+            </Label>
+            <Input
+              value={form.expertRegistrationCode}
+              onChange={(e) => set("expertRegistrationCode", e.target.value)}
+              placeholder="e.g. PHAMORA-PANEL"
+              className="w-64 rounded-xl"
+            />
+            <p className="mt-2 text-xs text-muted-foreground">
+              If set, experts must type this code to register, so only people you share it with can join. Leave
+              blank to allow anyone with the link.
+            </p>
+          </div>
         </SettingsCard>
 
         <SettingsCard title="Assessment Behaviour">
