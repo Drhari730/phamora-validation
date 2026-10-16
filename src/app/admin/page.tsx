@@ -72,9 +72,6 @@ export default function AdminLoginPage() {
           >
             {pending ? "Signing in…" : "Sign In"}
           </Button>
-          <p className="mt-4 text-center text-[11px] text-muted-foreground">
-            Demo: admin@phamora.study / PhamoraAdmin@2026
-          </p>
         </div>
       </div>
     </div>

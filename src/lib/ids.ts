@@ -8,6 +8,10 @@ export async function nextParticipantCode(): Promise<string> {
 
 /** Next sequential PHA-EXP-## code. */
 export async function nextExpertCode(): Promise<string> {
-  const count = await prisma.expert.count();
-  return `PHA-EXP-${String(count + 1).padStart(2, "0")}`;
+  const experts = await prisma.expert.findMany({ select: { expertCode: true } });
+  const highest = experts.reduce((max, e) => {
+    const n = parseInt(e.expertCode.replace("PHA-EXP-", ""), 10);
+    return Number.isNaN(n) ? max : Math.max(max, n);
+  }, 0);
+  return `PHA-EXP-${String(highest + 1).padStart(2, "0")}`;
 }
