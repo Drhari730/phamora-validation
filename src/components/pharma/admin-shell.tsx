@@ -12,6 +12,7 @@ import {
   Download,
   Settings,
   LogOut,
+  Sigma,
 } from "lucide-react";
 import { Logo } from "@/components/pharma/logo";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/admin/students", label: "Students", icon: Users },
   { href: "/admin/experts", label: "Experts", icon: Microscope },
   { href: "/admin/cvi", label: "CVI Review", icon: ClipboardCheck },
+  { href: "/admin/analysis", label: "Analysis", icon: Sigma },
   { href: "/admin/instruments", label: "Instruments", icon: FileQuestion },
   { href: "/admin/export", label: "Data Export", icon: Download },
   { href: "/admin/settings", label: "Settings", icon: Settings },
