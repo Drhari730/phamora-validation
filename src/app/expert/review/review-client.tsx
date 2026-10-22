@@ -54,6 +54,18 @@ export function ReviewClient({ data }: { data: ReviewData }) {
     });
   }
 
+  const [finished, setFinished] = useState(false);
+  const unratedIndexes = items.flatMap((it, i) => (it.rating === undefined ? [i] : []));
+
+  function handleFinish() {
+    if (item.rating !== undefined) {
+      save({ contentItemId: item.id, rating: item.rating, comment: item.comment });
+    }
+    if (unratedIndexes.length === 0 || (unratedIndexes.length === 1 && unratedIndexes[0] === index)) {
+      setFinished(true);
+    }
+  }
+
   function handleNext() {
     if (item.rating !== undefined) {
       save({ contentItemId: item.id, rating: item.rating, comment: item.comment });
@@ -62,6 +74,26 @@ export function ReviewClient({ data }: { data: ReviewData }) {
   }
 
   const moduleProgress = Object.entries(data.moduleProgress);
+
+  if (finished) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-6">
+        <div className="w-full max-w-md rounded-3xl border border-border bg-card p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full bg-success/10 text-success">
+            <CircleCheck size={28} />
+          </div>
+          <h1 className="font-heading text-2xl font-bold">Thank you!</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Your review of all {total} items is complete and saved. Your expert input is a valuable part of the
+            PHAMORA content validation.
+          </p>
+          <Button variant="outline" className="mt-6 rounded-full" onClick={() => setFinished(false)}>
+            Review my ratings again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -195,14 +227,22 @@ export function ReviewClient({ data }: { data: ReviewData }) {
                 <CircleCheck size={14} className={pending ? "text-muted-foreground" : "text-success"} />
                 {pending ? "Saving…" : savedAt ? "Autosaved" : "Not yet rated"}
               </div>
-              <Button
-                className="rounded-full"
-                disabled={index === total - 1 || item.rating === undefined}
-                onClick={handleNext}
-              >
-                Save &amp; Next <ChevronRight size={16} />
-              </Button>
+              {index === total - 1 ? (
+                <Button className="rounded-full" disabled={item.rating === undefined} onClick={handleFinish}>
+                  Finish Review <CircleCheck size={16} />
+                </Button>
+              ) : (
+                <Button className="rounded-full" disabled={item.rating === undefined} onClick={handleNext}>
+                  Save &amp; Next <ChevronRight size={16} />
+                </Button>
+              )}
             </div>
+            {index === total - 1 && unratedIndexes.some((i) => i !== index) && (
+              <p className="mt-4 text-center text-xs text-destructive">
+                Not yet rated: item {unratedIndexes.filter((i) => i !== index).map((i) => i + 1).join(", ")}. Use
+                Previous to go back and rate {unratedIndexes.length > 2 ? "them" : "it"} before finishing.
+              </p>
+            )}
           </>
         )}
       </main>
